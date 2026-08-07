@@ -131,7 +131,8 @@ export default function VenuePage({ slug, table }) {
         'id, slug, name, logo_url, welcome_text, yandex_review_url, google_review_url, ' +
         'gis2_review_url, menu_url, wifi_ssid, wifi_password, instagram_url, telegram_url, ' +
         'phone, address, accent_color, text_color, background_image_url, preset_key, ' +
-        'enabled_blocks, block_links, service_options, rating_platform_order, taxi_classes'
+        'enabled_blocks, block_links, service_options, rating_platform_order, taxi_classes, ' +
+        'subscription_active, subscription_note'
       let { data, error } = await supabase
         .from('venues')
         .select(`${VENUE_COLUMNS}, preset:presets(*)`)
@@ -185,6 +186,18 @@ export default function VenuePage({ slug, table }) {
     return (
       <div className="page center">
         <div className="spinner" />
+      </div>
+    )
+  }
+
+  if (venue && venue.subscription_active === false) {
+    return (
+      <div className="page center">
+        <div className="notfound">
+          <div className="notfound-emoji">⏸️</div>
+          <h1>Сервис временно недоступен</h1>
+          <p>{venue.subscription_note || 'Свяжитесь с администрацией заведения.'}</p>
+        </div>
       </div>
     )
   }
