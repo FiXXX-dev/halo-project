@@ -25,6 +25,8 @@ const EMPTY_VENUE = {
   block_links: {},
   service_options: null,
   rating_platform_order: null,
+  subscription_active: true,
+  subscription_note: '',
 }
 
 const FIELDS = [
@@ -187,6 +189,11 @@ function Dashboard() {
             <span className="venue-row-name">
               {v.name}
               {v.preset_key && <span className="venue-row-preset">{presetName(v.preset_key)}</span>}
+              {v.subscription_active === false && (
+                <span className="venue-row-preset" style={{ background: '#fee2e2', color: '#b91c1c' }}>
+                  не оплачено
+                </span>
+              )}
             </span>
             <span className="venue-row-slug">/v/{v.slug}</span>
           </button>
@@ -387,6 +394,28 @@ function VenueEditor({ venue, presets, onBack }) {
         {!isNew && <OwnersCard venue={venue} />}
 
         <form className="card admin-form" onSubmit={save}>
+          {!isNew && (
+            <div className="admin-field">
+              <span>Подписка</span>
+              <label className={`block-toggle ${form.subscription_active ? 'on' : ''}`}>
+                <input
+                  type="checkbox"
+                  checked={form.subscription_active}
+                  onChange={(e) => set('subscription_active', e.target.checked)}
+                />
+                {form.subscription_active ? 'Оплачена — гости видят страницу' : 'Приостановлена — гости видят заглушку'}
+              </label>
+              {!form.subscription_active && (
+                <input
+                  type="text"
+                  placeholder="Текст на заглушке (необязательно)"
+                  value={form.subscription_note || ''}
+                  onChange={(e) => set('subscription_note', e.target.value)}
+                />
+              )}
+            </div>
+          )}
+
           <label className="admin-field">
             <span>Тип заведения (пресет)</span>
             <select value={form.preset_key || ''} onChange={(e) => pickPreset(e.target.value)}>
