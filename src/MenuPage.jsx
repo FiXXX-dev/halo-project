@@ -26,12 +26,19 @@ export default function MenuPage({ slug }) {
       const { data: venue } = await supabase
         .from('venues')
         .select(
-          'id, slug, name, logo_url, accent_color, text_color, background_image_url, menu_url, menu_languages'
+          'id, slug, name, logo_url, accent_color, text_color, background_image_url, menu_url, menu_languages, subscription_active, subscription_note'
         )
         .eq('slug', slug)
         .maybeSingle()
       if (!venue) {
         if (!cancelled) setLoading(false)
+        return
+      }
+      if (venue.subscription_active === false) {
+        if (!cancelled) {
+          setData({ venue, sections: [], categories: [], items: [], paused: true })
+          setLoading(false)
+        }
         return
       }
       const [sec, cat, items] = await Promise.all([
@@ -109,6 +116,17 @@ export default function MenuPage({ slug }) {
         <div className="notfound">
           <div className="notfound-emoji">🍽️</div>
           <h1>Меню не найдено</h1>
+        </div>
+      </div>
+    )
+  }
+  if (data.paused) {
+    return (
+      <div className="page center">
+        <div className="notfound">
+          <div className="notfound-emoji">⏸️</div>
+          <h1>Сервис временно недоступен</h1>
+          <p>{data.venue?.subscription_note || 'Свяжитесь с администрацией заведения.'}</p>
         </div>
       </div>
     )
